@@ -1,0 +1,173 @@
+---
+title: "selenium blahaj test in Rmd"
+author: "ag5tc"
+date: "2/4/2021"
+output:
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(reticulate)
+```
+
+```{python}
+from selenium import webdriver
+import time
+import pandas as pd
+```
+
+```{r}
+# input URL for IKEA article
+URL = 'https://www.ikea.com/us/en/p/blahaj-soft-toy-shark-90373590/'
+```
+
+```{python}
+# set up Chrome webdriver with Selenium
+driver = webdriver.Chrome()
+driver.get(r.URL)
+time.sleep(5)
+```
+
+```{python}
+# accept cookies (ensures smooth operation)
+ok_cookies = '/html/body/div[8]/div/div[2]/button/span'
+driver.find_elements_by_xpath(ok_cookies)[0].click()
+
+# ascertain number of reviews
+n_reviews = driver.find_elements_by_class_name('range-revamp-average-rating__reviews')[0].text
+n_reviews = int(n_reviews[1:len(n_reviews)-1])
+
+# ascertain how many pages of reviews are to be looped over
+pages = n_reviews//20
+remainder = n_reviews%20
+
+# open Reviews
+open_reviews = '//*[@id="content"]/div/div[1]/div/div[2]/div[2]/div[2]/div[3]/button/span'
+driver.find_elements_by_xpath(open_reviews)[0].click()
+```
+
+```{python}
+ratings = []
+names_dates = []
+titles = []
+reviews = []
+
+star = 'range-revamp-svg-icon range-revamp-ratings-bar__star range-revamp-ratings-bar__star--filled'
+right_arrow = '//*[@id="range-modal-mount-node"]/div/div[3]/div/div[2]/div/div[2]/div[22]/button[2]'
+
+time.sleep(5)
+```
+
+```{python}
+# loop over reviews
+for i in range(pages):
+    for x in range(2,22):
+        xpath_prefix = '//*[@id="range-modal-mount-node"]/div/div[3]/div/div[2]/div/div[2]'
+        xpath_base = xpath_prefix + '/div[' + str(x) + ']'
+    
+        # the rating
+        xpath_rating_base = xpath_base + '/div[1]/div[1]/span/'
+        rating = 0
+        for i in range(1,6):
+            xpath_rating = xpath_rating_base + '*[name()="svg"][' + str(i) + ']'
+            test_element = driver.find_elements_by_xpath(xpath_rating)[0]
+            if test_element.get_attribute('class') == star:
+                rating += 1
+        ratings.append(rating)
+    
+        # the name and date
+        xpath_name_date = xpath_base + '/div[1]/div[2]'
+        element_name_date = driver.find_elements_by_xpath(xpath_name_date)[0]
+        name_date = element_name_date.text
+        names_dates.append(name_date)
+    
+        # the title
+        xpath_title = xpath_base + '/div[2]'
+        try:
+            element_title = driver.find_elements_by_xpath(xpath_title)[0]
+            title = element_title.text
+            titles.append(title)
+        except:
+            titles.append('n/a')
+    
+        # the review
+        xpath_review = xpath_base + '/div[3]'
+        try:
+            element_review = driver.find_elements_by_xpath(xpath_review)[0]
+            review = element_review.text
+            reviews.append(review)
+        except:
+            reviews.append('n/a')
+    
+    # next 20
+    driver.find_elements_by_xpath(right_arrow)[0].click()
+    time.sleep(2.5)
+
+# last however many
+for x in range(2,remainder+2):
+    xpath_prefix = '//*[@id="range-modal-mount-node"]/div/div[3]/div/div[2]/div/div[2]'
+    xpath_base = xpath_prefix + '/div[' + str(x) + ']'
+    
+    # the rating
+    xpath_rating_base = xpath_base + '/div[1]/div[1]/span/'
+    rating = 0
+    for i in range(1,6):
+        xpath_rating = xpath_rating_base + '*[name()="svg"][' + str(i) + ']'
+        test_element = driver.find_elements_by_xpath(xpath_rating)[0]
+        if test_element.get_attribute('class') == star:
+            rating += 1
+    ratings.append(rating)
+    
+    # the name and date
+    xpath_name_date = xpath_base + '/div[1]/div[2]'
+    element_name_date = driver.find_elements_by_xpath(xpath_name_date)[0]
+    name_date = element_name_date.text
+    names_dates.append(name_date)
+    
+    # the title
+    xpath_title = xpath_base + '/div[2]'
+    try:
+        element_title = driver.find_elements_by_xpath(xpath_title)[0]
+        title = element_title.text
+        titles.append(title)
+    except:
+        titles.append('n/a')
+    
+    # the review
+    xpath_review = xpath_base + '/div[3]'
+    try:
+        element_review = driver.find_elements_by_xpath(xpath_review)[0]
+        review = element_review.text
+        reviews.append(review)
+    except:
+        reviews.append('n/a')
+```
+
+```{python}
+# Clean up author and date data
+authors = []
+dates = []
+
+for x in names_dates:
+    index = x.find(' - ')
+    authors.append(x[0:index])
+    dates.append(x[index+3:])
+
+```
+
+```{python eval=FALSE, include=FALSE}
+# put data in Pandas data frame
+data_dict = {'Author':authors, 'Date': dates, 'Rating':ratings, 'Title':titles, 'Review':reviews}
+data = pd.DataFrame(data_dict)
+```
+
+```{r}
+# put data in R data frame
+data <- data.frame(Author=py$authors,
+                   Date=py$dates,
+                   Rating=py$ratings,
+                   Title=py$titles,
+                   Review=py$reviews)
+View(data)
+```
