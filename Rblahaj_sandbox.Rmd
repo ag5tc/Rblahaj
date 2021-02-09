@@ -1,0 +1,45 @@
+---
+title: "blahaj sandbox in Rmd"
+author: "ag5tc"
+date: "2/9/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# load data scraped by RBlahaj
+load("output.RData")
+```
+
+```{r}
+# add stars
+star <- "\U2B50"
+data$Stars <- ""
+
+for (i in 1:nrow(data)) {
+  data$Stars[i] <- paste0(rep(star, data$Rating[i]),collapse="")
+}
+```
+
+```{r}
+# add translations
+data$Title[30] <- paste0(data$Title[30],
+                         " (It's too cute!)"
+                         )
+
+data$Review[30] <- paste0(data$Review[30],
+                          "\n(My son was very happy. After seeing the photo, my daughter wanted it too, so I will buy more when I go there again.)"
+                          )
+
+data$Author[41] <- paste0(data$Author[41], 
+                          " (Electric Heater)"
+                          )
+```
+
+```{r}
+# save data
+save(data, file="output_sandbox.RData")
+```

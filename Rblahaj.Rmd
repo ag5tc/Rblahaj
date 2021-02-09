@@ -2,8 +2,7 @@
 title: "selenium blahaj test in Rmd"
 author: "ag5tc"
 date: "2/4/2021"
-output:
-  html_document: default
+output: html_document
 ---
 
 ```{r setup, include=FALSE}
@@ -170,4 +169,9 @@ data <- data.frame(Author=py$authors,
                    Title=py$titles,
                    Review=py$reviews)
 View(data)
+```
+
+```{r}
+# save data
+save(data, file="output.RData")
 ```
