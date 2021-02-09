@@ -155,12 +155,6 @@ for x in names_dates:
 
 ```
 
-```{python eval=FALSE, include=FALSE}
-# put data in Pandas data frame
-data_dict = {'Author':authors, 'Date': dates, 'Rating':ratings, 'Title':titles, 'Review':reviews}
-data = pd.DataFrame(data_dict)
-```
-
 ```{r}
 # put data in R data frame
 data <- data.frame(Author=py$authors,
