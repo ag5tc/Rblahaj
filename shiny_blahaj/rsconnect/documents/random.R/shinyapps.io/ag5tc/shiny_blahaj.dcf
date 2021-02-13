@@ -1,0 +1,13 @@
+name: shiny_blahaj
+title: shiny_blahaj
+username:
+account: ag5tc
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 3623085
+bundleId: 4219223
+url: https://ag5tc.shinyapps.io/shiny_blahaj/
+when: 1613244609.30726
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: increment.R

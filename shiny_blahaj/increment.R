@@ -12,7 +12,7 @@
 library(shiny)
 
 ## initialize data
-load("~/coding/Rblahaj/output_sandbox.RData")
+load("output_sandbox.RData")
 blahaj <- function(index, column) data[index, column]
 
 # Define UI for application that draws a histogram

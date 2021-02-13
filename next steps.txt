@@ -1,0 +1,6 @@
+- make search functionality Shiny app:
+	- display only the reviews with word in them (among all fields)
+
+- sort functionality (date, stars)
+
+- make page with all of the reviews on it

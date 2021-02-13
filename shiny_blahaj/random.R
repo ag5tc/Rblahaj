@@ -12,7 +12,7 @@
 library(shiny)
 
 ##initialize data
-load("~/coding/Rblahaj/output_sandbox.RData")
+load("output_sandbox.RData")
 blahaj <- function(index, column, order) {
     data_ordered <- data[order,]
     return(data_ordered[index, column])
@@ -20,13 +20,21 @@ blahaj <- function(index, column, order) {
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
-    titlePanel("a BLÅHAJ a day keeps the rona away"),
+    titlePanel(
+        title = "a BLÅHAJ a day keeps the rona away",
+        windowTitle = "random BLÅHAJ generator"
+    ),
+    
     sidebarLayout(
         sidebarPanel(
-            actionButton("button", label = "I'm Feeling Lucky")
+            img(src = "blahaj-side-inverse.png", width = "40%"),
+            actionButton("button", label = "I'm Feeling Lucky"),
         ),
         
         mainPanel(
+            img(src = "blahaj-hi-transp.png", 
+                width = "50%",
+                style = "float:right"),
             h2(textOutput("stars")),
             h4(textOutput("author")),
             h4(textOutput("date")),
