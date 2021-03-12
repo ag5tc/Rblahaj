@@ -4,3 +4,7 @@
 - sort functionality (date, stars)
 
 - make page with all of the reviews on it
+
+
+- output to png / clipboard: send Blahaj to a friend
+- make print / ecard layout
