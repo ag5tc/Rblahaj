@@ -1,171 +1,153 @@
 ---
-title: "selenium blahaj test in Rmd"
-author: "ag5tc"
-date: "2/4/2021"
+title: "Selenium BLÅHAJ Scraper"
+subtitle: "RStudio Notebook"
+author: "Ari Ghasemian"
+date: "4/20/2023"
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-library(reticulate)
-```
-
-```{python}
-from selenium import webdriver
-import time
-import pandas as pd
 ```
 
 ```{r}
+# import R packages
+library(tidyverse)
+library(reticulate)
+reticulate::use_condaenv("blahaj", required = TRUE)
+```
+
+```{python}
+# import python packages
+import json, time, re
+# selenium 4
+from selenium import webdriver
+from selenium.common.exceptions import *
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service as ChromeService
+from webdriver_manager.chrome import ChromeDriverManager
+```
+
+```{python}
+# set up Chrome webdriver with Selenium
+# use Webdriver Manager for Python
+# Start the driver 
+options = webdriver.ChromeOptions()
+options.add_argument("--headless")
+options.add_argument('--window-size=1920,1080')
+options.add_argument("--no-sandbox")
+options.add_argument('--disable-dev-shm-usage')
+
+driver = webdriver.Chrome(
+  service=ChromeService(ChromeDriverManager().install()),
+  options=options
+)
+```
+
+```{python}
 # input URL for IKEA article
 URL = 'https://www.ikea.com/us/en/p/blahaj-soft-toy-shark-90373590/'
 ```
 
 ```{python}
-# set up Chrome webdriver with Selenium
-driver = webdriver.Chrome()
-driver.get(r.URL)
+# navigate to the URL for the product
+driver.get(URL)
 time.sleep(5)
 ```
 
 ```{python}
 # accept cookies (ensures smooth operation)
-ok_cookies = '/html/body/div[8]/div/div[2]/button/span'
-driver.find_elements_by_xpath(ok_cookies)[0].click()
-
-# ascertain number of reviews
-n_reviews = driver.find_elements_by_class_name('range-revamp-average-rating__reviews')[0].text
-n_reviews = int(n_reviews[1:len(n_reviews)-1])
-
-# ascertain how many pages of reviews are to be looped over
-pages = n_reviews//20
-remainder = n_reviews%20
-
-# open Reviews
-open_reviews = '//*[@id="content"]/div/div[1]/div/div[2]/div[2]/div[2]/div[3]/button/span'
-driver.find_elements_by_xpath(open_reviews)[0].click()
+try:
+  driver.find_element(By.ID, "onetrust-accept-btn-handler").click()
+except NoSuchElementException:
+  pass
 ```
 
 ```{python}
-ratings = []
-names_dates = []
-titles = []
-reviews = []
-
-star = 'range-revamp-svg-icon range-revamp-ratings-bar__star range-revamp-ratings-bar__star--filled'
-right_arrow = '//*[@id="range-modal-mount-node"]/div/div[3]/div/div[2]/div/div[2]/div[22]/button[2]'
-
+# open the Reviews pane
+driver.find_element(By.CLASS_NAME, "pip-chunky-header__reviews").click()
 time.sleep(5)
 ```
 
 ```{python}
-# loop over reviews
-for i in range(pages):
-    for x in range(2,22):
-        xpath_prefix = '//*[@id="range-modal-mount-node"]/div/div[3]/div/div[2]/div/div[2]'
-        xpath_base = xpath_prefix + '/div[' + str(x) + ']'
-    
-        # the rating
-        xpath_rating_base = xpath_base + '/div[1]/div[1]/span/'
-        rating = 0
-        for i in range(1,6):
-            xpath_rating = xpath_rating_base + '*[name()="svg"][' + str(i) + ']'
-            test_element = driver.find_elements_by_xpath(xpath_rating)[0]
-            if test_element.get_attribute('class') == star:
-                rating += 1
-        ratings.append(rating)
-    
-        # the name and date
-        xpath_name_date = xpath_base + '/div[1]/div[2]'
-        element_name_date = driver.find_elements_by_xpath(xpath_name_date)[0]
-        name_date = element_name_date.text
-        names_dates.append(name_date)
-    
-        # the title
-        xpath_title = xpath_base + '/div[2]'
-        try:
-            element_title = driver.find_elements_by_xpath(xpath_title)[0]
-            title = element_title.text
-            titles.append(title)
-        except:
-            titles.append('n/a')
-    
-        # the review
-        xpath_review = xpath_base + '/div[3]'
-        try:
-            element_review = driver.find_elements_by_xpath(xpath_review)[0]
-            review = element_review.text
-            reviews.append(review)
-        except:
-            reviews.append('n/a')
-    
-    # next 20
-    driver.find_elements_by_xpath(right_arrow)[0].click()
-    time.sleep(2.5)
-
-# last however many
-for x in range(2,remainder+2):
-    xpath_prefix = '//*[@id="range-modal-mount-node"]/div/div[3]/div/div[2]/div/div[2]'
-    xpath_base = xpath_prefix + '/div[' + str(x) + ']'
-    
-    # the rating
-    xpath_rating_base = xpath_base + '/div[1]/div[1]/span/'
-    rating = 0
-    for i in range(1,6):
-        xpath_rating = xpath_rating_base + '*[name()="svg"][' + str(i) + ']'
-        test_element = driver.find_elements_by_xpath(xpath_rating)[0]
-        if test_element.get_attribute('class') == star:
-            rating += 1
-    ratings.append(rating)
-    
-    # the name and date
-    xpath_name_date = xpath_base + '/div[1]/div[2]'
-    element_name_date = driver.find_elements_by_xpath(xpath_name_date)[0]
-    name_date = element_name_date.text
-    names_dates.append(name_date)
-    
-    # the title
-    xpath_title = xpath_base + '/div[2]'
-    try:
-        element_title = driver.find_elements_by_xpath(xpath_title)[0]
-        title = element_title.text
-        titles.append(title)
-    except:
-        titles.append('n/a')
-    
-    # the review
-    xpath_review = xpath_base + '/div[3]'
-    try:
-        element_review = driver.find_elements_by_xpath(xpath_review)[0]
-        review = element_review.text
-        reviews.append(review)
-    except:
-        reviews.append('n/a')
+# output the results as a list of lists
+list_of_rows = []
+cols = ["rating", "date", "name", "location", "title", "review_text"]
 ```
 
 ```{python}
-# Clean up author and date data
-authors = []
-dates = []
+# loop over each page of reviews
 
-for x in names_dates:
-    index = x.find(' - ')
-    authors.append(x[0:index])
-    dates.append(x[index+3:])
+# check whether there are more pages to loop over
+keep_going = True
 
+while keep_going == True:
+  time.sleep(5)
+  page_reviews = driver.find_elements(By.CLASS_NAME, "ugc-rr-pip-fe-ratings-and-reviews__review")
+
+  for review in page_reviews:
+    # the rating (number of stars)
+    rating = len(review.find_elements(By.CLASS_NAME, "ugc-rr-pip-fe-ratings-star-bar__star--filled"))
+
+    # the date of the review
+    date = review.find_element(By.CLASS_NAME, "ugc-rr-pip-fe-ratings-and-reviews__review-date").text
+
+    # the name of the reviewer
+    name_loc = review.find_element(By.CLASS_NAME, "ugc-rr-pip-fe-ratings-and-reviews__reviewer-name").text
+    
+    name, location = name_loc.split('\n- ')
+    
+    # sometimes there is no title
+    try:
+      # the title
+      title = review.find_element(By.CLASS_NAME, "ugc-rr-pip-fe-ratings-and-reviews__review-title").text
+    except NoSuchElementException:
+      title = ''
+    
+    # the review text
+    review_text = review.find_element(By.CLASS_NAME, "ugc-rr-pip-fe-ratings-and-reviews__review-text").text
+    
+    # also scrape the ratings and reviews "categories"?
+    # i.e. Value for money, Product quality, Appearance, Works as expected
+    # (each is a value 1-5
+    
+    
+    # put it all together
+    row = [rating, date, name, location, title, review_text]
+    list_of_rows.append(row)
+    
+  # is this the last page?
+  # if the next page arrow button is not clickable
+  next_page = driver.find_elements(By.CLASS_NAME, "ugc-rr-pip-fe-ratings-and-reviews__pagination-button")[1]
+  if next_page.is_enabled():
+    next_page.click()
+  else:
+    keep_going = False
+```
+
+```{python}
+# save memory
+driver.close()
+driver.quit()
+```
+
+```{python}
+print(len(list_of_rows))
 ```
 
 ```{r}
-# put data in R data frame
-data <- data.frame(Author=py$authors,
-                   Date=py$dates,
-                   Rating=py$ratings,
-                   Title=py$titles,
-                   Review=py$reviews)
-View(data)
+# transform the output from python list of lists to R data frame
+list_of_rows <- t(sapply(py$list_of_rows, unlist))
+colnames(list_of_rows) <- py$cols
+data <- as_tibble(list_of_rows) %>%
+  mutate(
+    rating = as.integer(rating),
+    date = mdy(date)
+  )
+glimpse(data)
 ```
 
 ```{r}
 # save data
-save(data, file="output.RData")
+save(data, file="shiny_blahaj/output.RData")
 ```
