@@ -39,3 +39,7 @@ vignettes/*.pdf
 
 # OSX files
 .DS_Store
+
+# Shiny app stuff
+**/rsconnect/*
+
