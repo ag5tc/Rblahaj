@@ -4,7 +4,7 @@
 An RStudio notebook to scrape reviews for IKEA products.  Tested on the cult classic BLÅHAJ Soft toy, shark, 39¼".
 
 ## Why?
-I wanted to teach myself the basics of Web scraping using Selenium.  It would have been easier to keep all of this in a python Jupyter notebook.  At the time, however, my python was very weak, and I was getting comfortable exploring datasets in R.  Instead, I took the chance to learn [reticulate](https://rstudio.github.io/reticulate/) and did what I knew how to do in each language.  
+I wanted to teach myself the basics of Web scraping using Selenium.  It would have been easier to keep all of this in a python Jupyter notebook.  At the time, however, my python was very weak, and I was getting comfortable exploring datasets in R.  Instead, I took the chance to learn [reticulate](https://rstudio.github.io/reticulate/) and did what I knew how to do in each language.  The rendered version of the RMarkdown notebook is [here](https://ag5tc.github.io/Rblahaj/Rblahaj.html).
 
 ## Shiny app
 Because why not? A little app to print random reviews, hosted [here](http://ag5tc.shinyapps.io/shiny_blahaj/).  
