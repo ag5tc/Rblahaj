@@ -9,5 +9,5 @@ I wanted to teach myself the basics of Web scraping using Selenium.  It would ha
 ## Shiny app
 Because why not? A little app to print random reviews, hosted [here](http://ag5tc.shinyapps.io/shiny_blahaj/).  
 
-### 2023 update:
+## 2023 update:
 My python is a lot better now, so I went back over and cleaned up the code.  Ran into the delightful challenge of having both `x86_64` and `arm64` conda environments on one (Apple M1) machine.  
